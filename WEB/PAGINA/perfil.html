@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario - QuizoraX</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Chakra+Petch:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #060810;
+            --card-bg: rgba(14, 18, 30, 0.92);
+            --gold-accent: #ffb703;
+            --cyber-cyan: #00f0ff;
+            --plasma-magenta: #ff0077;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Chakra Petch', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            background-image: 
+                radial-gradient(ellipse at 50% 0%, rgba(255, 183, 3, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0, 240, 255, 0.1) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(6, 8, 16, 0.8) 0%, rgba(6, 8, 16, 0.95) 100%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.02) 2px, rgba(0, 240, 255, 0.02) 4px);
+        }
+        .rank-container strong {
+    font-size: 1.5rem;
+        }
+
+        /* Líneas de escáner superior e inferior */
+        .cyber-line-top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold-accent), var(--cyber-cyan), transparent);
+            box-shadow: 0 0 15px var(--cyber-cyan);
+            z-index: 10;
+        }
+
+        .cyber-line-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--plasma-magenta), var(--gold-accent), transparent);
+            box-shadow: 0 0 15px var(--plasma-magenta);
+            z-index: 10;
+        }
+
+        /* Tarjeta Principal Estilo HUD */
+        .hud-card {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 680px;
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            padding: 45px 35px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6),
+                        0 0 25px rgba(0, 240, 255, 0.08);
+            clip-path: polygon(
+                0 20px, 
+                20px 0, 
+                calc(100% - 20px) 0, 
+                100% 20px, 
+                100% calc(100% - 20px), 
+                calc(100% - 20px) 100%, 
+                20px 100%, 
+                0 calc(100% - 20px)
+            );
+        }
+
+        .hud-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 3px;
+            background: var(--gold-accent);
+            box-shadow: 0 0 10px var(--gold-accent);
+        }
+
+        /* TÍTULO (USERNAME) */
+        .hud-title {
+            font-family: 'Teko', sans-serif;
+            font-size: clamp(3rem, 7vw, 4.5rem);
+            line-height: 1;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 30px;
+            
+            color: var(--text-primary);
+            background: linear-gradient(180deg, #ffffff 30%, var(--cyber-cyan) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            
+            filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.4));
+        }
+
+        /* ESTRUCTURA DE CAMPOS */
+        .field-group {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .field-label {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* TEXTAREA (Inamovible) */
+        .cyber-textarea {
+            width: 100%;
+            height: 120px;
+            background: rgba(6, 8, 16, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 4px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: none; /* Evita que el usuario mueva o cambie el tamaño */
+            outline: none;
+            transition: all 0.25s ease;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .cyber-textarea:focus {
+            border-color: var(--cyber-cyan);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .rank-container {
+            width: 100%;
+            max-width: 320px;
+            height: 48px;
+            background: rgba(6, 8, 16, 0.6);
+            border: 1px solid rgba(255, 183, 3, 0.4);
+            border-radius: 4px;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+            transition: all 0.25s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center; 
+        }
+
+        @media (max-width: 768px) {
+            .hud-card {
+                padding: 35px 25px;
+            }
+            .hud-title {
+                font-size: 3.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+            .hud-card {
+                padding: 30px 18px;
+            }
+            .hud-title {
+                font-size: 2.6rem;
+                letter-spacing: 2px;
+            }
+            .field-label {
+                font-size: 0.95rem;
+            }
+            .rank-container {
+                max-width: 100%; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cyber-line-top"></div>
+    <div class="cyber-line-bottom"></div>
+
+    <main class="hud-card">
+        <h1 class="hud-title" id="usertxt">USERNAME</h1>
+        <div class="field-group">
+            <label class="field-label" for="description-input">Descripcion</label>
+            <textarea id="description-input" class="cyber-textarea" readonly></textarea>
+        </div>
+
+        <div class="field-group">
+            <label class="field-label">Posicion en la clasificacion global</label>
+            <div class="rank-container"></div>
+        </div>
+    </main>
+
+</body>
+<script>
+    const usertxt = document.getElementById("usertxt")
+    const desc = document.getElementById("description-input")
+    const container_rank = document.querySelector(".rank-container")
+    fetch(`/api/perfiles/${window.location.pathname.split("/")[2]}`)
+    .then(res=>res.json())
+    .then(rpta=>{
+        usertxt.textContent = rpta.usuario
+        desc.value = rpta.descp
+        if (typeof rpta.posicion === "string"){
+            container_rank.textContent = rpta.posicion
+        } else if (typeof rpta.posicion === "object"){
+            container_rank.innerHTML = `<strong>#${rpta.posicion.puesto}</strong>(${rpta.posicion.puntos} puntos)`
+            if (rpta.posicion.puesto === 1){
+                container_rank.style.color = "rgb(184, 134, 11)"
+            } else if (rpta.posicion.puesto === 2){
+                container_rank.style.color = "rgb(181, 181, 181)"
+            } else if (rpta.posicion.puesto === 3){
+                container_rank.style.color = "rgb(176, 141, 87)"
+            }
+        }
+    })
+</script>
+</html>

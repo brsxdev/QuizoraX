@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizoraX - Ranking Global - Arena Competitiva</title>
+    
+    <!-- Mismas fuentes que la referencia -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Chakra+Petch:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES Y RESET (Mismo estilo) --- */
+        :root {
+            --bg-dark: #060810;
+            --card-bg: rgba(14, 18, 30, 0.95); /* Un poco más opaco para lectura */
+            --gold-accent: #ffb703;
+            --cyber-cyan: #00f0ff;
+            --plasma-magenta: #ff0077;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --row-bg-alt: rgba(255, 255, 255, 0.03);
+            --row-hover: rgba(0, 240, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Chakra Petch', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Centrado vertical */
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            /* Fondo con gradientes de la referencia */
+            background-image: 
+                radial-gradient(ellipse at 50% 0%, rgba(255, 183, 3, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0, 240, 255, 0.1) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(6, 8, 16, 0.8) 0%, rgba(6, 8, 16, 0.95) 100%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.02) 2px, rgba(0, 240, 255, 0.02) 4px);
+        }
+
+        /* --- LÍNEAS DE ESCÁNER (Estilo Referencia) --- */
+        .cyber-line-top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold-accent), var(--cyber-cyan), transparent);
+            box-shadow: 0 0 15px var(--cyber-cyan);
+            z-index: 10;
+        }
+
+        .cyber-line-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--plasma-magenta), var(--gold-accent), transparent);
+            box-shadow: 0 0 15px var(--plasma-magenta);
+            z-index: 10;
+        }
+
+        /* --- TARJETA PRINCIPAL HUD (Estilo Referencia) --- */
+        .hud-card {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 800px; /* Un poco más ancho para la tabla */
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            padding: 40px 25px 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6),
+                        0 0 25px rgba(0, 240, 255, 0.08);
+            
+            /* Esquinas recortadas HUD */
+            clip-path: polygon(
+                0 20px, 
+                20px 0, 
+                calc(100% - 20px) 0, 
+                100% 20px, 
+                100% calc(100% - 20px), 
+                calc(100% - 20px) 100%, 
+                20px 100%, 
+                0 calc(100% - 20px)
+            );
+        }
+
+        /* Adorno superior (Línea Oro) */
+        .hud-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 3px;
+            background: var(--gold-accent);
+            box-shadow: 0 0 10px var(--gold-accent);
+        }
+
+        /* --- CABECERA (Badge, Título y Nota) --- */
+        .hud-badge {
+            display: inline-block;
+            font-family: 'Teko', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold-accent);
+            background: rgba(255, 183, 3, 0.1);
+            border: 1px solid var(--gold-accent);
+            padding: 2px 14px;
+            margin-bottom: 10px;
+            border-radius: 2px;
+        }
+
+        .hud-title {
+            font-family: 'Teko', sans-serif;
+            /* Responsivo: grande en desktop, adaptable en mobile */
+            font-size: clamp(2.8rem, 7vw, 4.2rem);
+            line-height: 0.9;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            
+            /* Gradiente de texto de la referencia */
+            color: var(--text-primary);
+            background: linear-gradient(180deg, #ffffff 30%, var(--cyber-cyan) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            
+            filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.4));
+        }
+
+        .hud-note {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hud-note strong {
+            color: var(--plasma-magenta);
+        }
+
+        /* --- CONTENEDOR GRANDE CON SCROLL (El "Punto de Interés") --- */
+        .ranking-container {
+            width: 100%;
+            /* Altura máxima para activar el scroll vertical */
+            max-height: 450px; 
+            margin: 0 auto;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.2);
+            position: relative;
+            
+            /* Activación del Scroll Vertical */
+            overflow-y: auto;
+            
+            /* Clip-path suavizado para el contenedor interno */
+            clip-path: polygon(
+                0 10px, 10px 0,
+                calc(100% - 10px) 0, 100% 10px,
+                100% calc(100% - 10px), calc(100% - 10px) 100%,
+                10px 100%, 0 calc(100% - 10px)
+            );
+        }
+
+        /* --- ESTILIZADO DE LA BARRA DE DESPLAZAMIENTO (Scrollbar bonito) --- */
+        /* Ancho de la barra */
+        .ranking-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        /* Fondo del track (pista) */
+        .ranking-container::-webkit-scrollbar-track {
+            background: rgba(6, 8, 16, 0.5);
+            border-left: 1px solid rgba(0, 240, 255, 0.1);
+        }
+        /* El "tirador" (thumb) de la barra */
+        .ranking-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--cyber-cyan), var(--plasma-magenta));
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+        }
+        .ranking-container::-webkit-scrollbar-thumb:hover {
+            background: #ffffff;
+        }
+
+        /* --- ESTRUCTURA DE LA TABLA / DIVS --- */
+        
+        /* Encabezado fijo (PUESTO Y NOMBRE | PUNTOS) */
+        .ranking-header {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: #0e121e; /* Fondo sólido para que no se traslome al scrollear */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            border-bottom: 2px solid var(--cyber-cyan);
+            font-family: 'Teko', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.2rem;
+            color: var(--cyber-cyan);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        /* Filas de datos */
+        .ranking-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s ease;
+        }
+
+        /* Color alterno para filas */
+        .ranking-row:nth-child(even) {
+            background-color: var(--row-bg-alt);
+        }
+
+        /* Efecto hover en filas */
+        .ranking-row:hover:not(.ranking-header) {
+            background-color: var(--row-hover);
+            cursor: pointer;
+        }
+
+        /* Estilos para las columnas */
+        .col-main {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Espacio entre puesto y nombre */
+            flex: 1; /* Toma el espacio disponible */
+            text-align: left;
+        }
+
+        .col-points {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #ffffff;
+            width: 100px; /* Ancho fijo para puntos */
+            text-align: right;
+        }
+
+        /* --- DETALLES VISUALES DENTRO DE LA FILA --- */
+        .puesto-number {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffffff;
+            width: 30px;
+            text-align: center;
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.05rem;
+        }
+
+
+
+        /* --- RESPONSIVE DESIGN (Adaptabilidad) --- */
+        
+        /* Tablets y móviles grandes */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            .hud-card {
+                padding: 30px 15px 20px;
+            }
+            .ranking-header, .ranking-row {
+                padding: 12px 15px;
+            }
+        }
+
+        /* Móviles pequeños */
+        @media (max-width: 480px) {
+            .hud-title {
+                font-size: 2.5rem;
+                letter-spacing: 2px;
+            }
+            .hud-note {
+                font-size: 0.85rem;
+                margin-bottom: 20px;
+            }
+            .ranking-row {
+                padding: 8px 12px;
+            }
+            .col-points {
+                font-size: 1.1rem;
+                width: 80px;
+            }
+            .puesto-number {
+                font-size: 1.2rem;
+                width: 25px;
+            }
+            .player-name {
+                font-size: 0.95rem;
+            }
+            /* Recorte HUD más pequeño en mobile */
+            .hud-card {
+                clip-path: polygon(
+                    0 15px, 15px 0, 
+                    calc(100% - 15px) 0, 100% 15px, 
+                    100% calc(100% - 15px), calc(100% - 15px) 100%, 
+                    15px 100%, 0 calc(100% - 15px)
+                );
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-line-top"></div>
+    <div class="cyber-line-bottom"></div>
+    <main class="hud-card">
+        <h1 class="hud-title">RANKING GLOBAL(PRIMEROS 20 PUESTOS)</h1>
+        <p class="hud-note">NOTA: Recargue la pagina cada vez para ver las puntuaciones actualizadas en <strong>tiempo real</strong></p>
+        <div class="ranking-container">
+            <div class="ranking-header">
+                <div>PUESTO Y NOMBRE</div> 
+                <div>PUNTOS</div>          
+            </div>
+
+        </div> 
+
+    </main>
+
+</body>
+<script>
+    const contenedoranking = document.querySelector(".ranking-container")
+    fetch("/obtenerpuestos",{method:"POST"})
+    .then(res=>res.json())
+    .then(rpta=>{
+        if (rpta.lista){
+            for (let elemento of rpta.lista){
+                let divprincipal = document.createElement("div")
+            divprincipal.classList.add("ranking-row")
+            contenedoranking.appendChild(divprincipal)
+            let divsecundario1 = document.createElement("div")
+            divsecundario1.classList.add("col-main")
+            divprincipal.appendChild(divsecundario1)
+            let spanpuesto = document.createElement("span")
+            spanpuesto.classList.add("puesto-number")
+            spanpuesto.textContent = `${elemento.puesto}`
+            divsecundario1.appendChild(spanpuesto)
+            let spanombre = document.createElement("span")
+            spanombre.classList.add("player-name")
+            spanombre.textContent = `${elemento.usuario}`
+            divsecundario1.appendChild(spanombre)
+            let divsecundario2 = document.createElement("div")
+            divsecundario2.classList.add("col-points")
+            divsecundario2.textContent = `${elemento.puntos}`
+            divprincipal.appendChild(divsecundario2)
+            if (elemento.puesto === 1){
+                divprincipal.style.backgroundColor = "rgba(184, 134, 11, 0.7)"
+            } else if (elemento.puesto === 2){
+                divprincipal.style.backgroundColor = "rgba(181, 181, 181, 0.7)"
+            } else if (elemento.puesto === 3){
+                divprincipal.style.backgroundColor = "rgba(176, 141, 87, 0.7)"
+            }
+            }
+        }
+    })
+</script>
+</html>

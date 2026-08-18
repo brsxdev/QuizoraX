@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizoraX - Panel de Gestión</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Chakra+Petch:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #060810;
+            --card-bg: rgba(14, 18, 30, 0.92);
+            --gold-accent: #ffb703;
+            --cyber-cyan: #00f0ff;
+            --plasma-magenta: #ff0077;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Chakra Petch', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            background-image: 
+                radial-gradient(ellipse at 50% 0%, rgba(255, 183, 3, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0, 240, 255, 0.1) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(6, 8, 16, 0.8) 0%, rgba(6, 8, 16, 0.95) 100%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.02) 2px, rgba(0, 240, 255, 0.02) 4px);
+        }
+
+        /* Líneas de escáner superior e inferior */
+        .cyber-line-top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold-accent), var(--cyber-cyan), transparent);
+            box-shadow: 0 0 15px var(--cyber-cyan);
+            z-index: 10;
+        }
+
+        .cyber-line-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--plasma-magenta), var(--gold-accent), transparent);
+            box-shadow: 0 0 15px var(--plasma-magenta);
+            z-index: 10;
+        }
+
+        /* Contenedor Principal HUD */
+        .hud-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1100px;
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6),
+                        0 0 25px rgba(0, 240, 255, 0.08);
+            clip-path: polygon(
+                0 20px, 
+                20px 0, 
+                calc(100% - 20px) 0, 
+                100% 20px, 
+                100% calc(100% - 20px), 
+                calc(100% - 20px) 100%, 
+                20px 100%, 
+                0 calc(100% - 20px)
+            );
+            display: flex;
+            gap: 30px;
+        }
+
+        .hud-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 3px;
+            background: var(--gold-accent);
+            box-shadow: 0 0 10px var(--gold-accent);
+        }
+
+        /* ASIDE - Lado Izquierdo */
+        .sidebar {
+            flex: 0 0 260px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border-right: 1px solid rgba(0, 240, 255, 0.2);
+            padding-right: 30px;
+            justify-content: flex-start;
+        }
+
+        /* MAIN - Lado Derecho */
+        .content-area {
+            flex: 1;
+            display: none;
+        }
+
+        .hud-title {
+            font-family: 'Teko', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 3.8rem);
+            line-height: 0.9;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            text-align: center;
+            color: var(--text-primary);
+            background: linear-gradient(180deg, #ffffff 30%, var(--cyber-cyan) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.4));
+        }
+
+        /* Formularios y Campos */
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 14px;
+            gap: 15px;
+        }
+
+        .form-group label {
+            width: 120px;
+            font-family: 'Teko', sans-serif;
+            font-size: 1.3rem;
+            letter-spacing: 1.5px;
+            color: var(--gold-accent);
+            text-transform: uppercase;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .form-group input {
+            flex: 1;
+            background: rgba(6, 8, 16, 0.7);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 10px 15px;
+            color: var(--text-primary);
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.25s ease;
+            clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+        }
+
+        .form-group input:focus {
+            border-color: var(--cyber-cyan);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+            background: rgba(14, 18, 30, 0.95);
+        }
+
+        /* Botones Generales */
+        .cyber-btn {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            outline: none;
+            border: none;
+            width: 100%;
+            display: inline-block;
+            text-align: center;
+        }
+
+        /* Botón estilo Dorado */
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold-accent) 0%, #d48800 100%);
+            color: #060810;
+            font-weight: 700;
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+            box-shadow: 0 0 15px rgba(255, 183, 3, 0.3);
+        }
+
+        .btn-gold:hover {
+            transform: scale(1.02);
+            background: linear-gradient(135deg, #ffc83b 0%, var(--gold-accent) 100%);
+            box-shadow: 0 0 25px rgba(255, 183, 3, 0.6);
+        }
+
+        /* Botón estilo Cyan */
+        .btn-cyan {
+            background: rgba(0, 240, 255, 0.05);
+            color: var(--cyber-cyan);
+            border: 1.5px solid var(--cyber-cyan);
+            font-weight: 600;
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+        }
+
+        .btn-cyan:hover {
+            background: rgba(0, 240, 255, 0.2);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            transform: scale(1.02);
+        }
+
+        /* Contenedor del Botón de Envío */
+        .submit-container {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .submit-container .cyber-btn {
+            max-width: 300px;
+        }
+
+        /* Diseños Responsivos para Tablets y Celulares */
+        @media (max-width: 850px) {
+            .hud-container {
+                flex-direction: column;
+                padding: 30px 20px;
+            }
+
+            .sidebar {
+                flex: none;
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+                padding-right: 0;
+                padding-bottom: 25px;
+            }
+
+            .form-group label {
+                width: 90px;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .form-group label {
+                text-align: left;
+                width: 100%;
+            }
+
+            .form-group input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cyber-line-top"></div>
+    <div class="cyber-line-bottom"></div>
+
+    <div class="hud-container">
+        <!-- Panel Izquierdo (Aside) con botones del mismo estilo -->
+        <aside class="sidebar">
+            <button class="cyber-btn btn-cyan" id="btn-insertar">Insertar pregunta</button>
+            <button class="cyber-btn btn-cyan" id="btn-cambiar">Cambiar pregunta</button>
+        </aside>
+
+        <!-- Panel Derecho (Main Content) -->
+        <main class="content-area">
+            <h1 class="hud-title">TÍTULO</h1>
+            
+            <form id="quiz-form">
+                <div class="form-group">
+                    <label for="id-input">ID</label>
+                    <input type="text" id="id-input" name="id" placeholder="Ingrese el ID...">
+                </div>
+
+                <div class="form-group">
+                    <label for="pregunta-input">PREGUNTA</label>
+                    <input type="text" id="pregunta-input" name="pregunta" placeholder="Ingrese la pregunta...">
+                </div>
+
+                <div class="form-group">
+                    <label for="oa-input">OA</label>
+                    <input type="text" id="oa-input" name="oa" placeholder="Opción A...">
+                </div>
+
+                <div class="form-group">
+                    <label for="ob-input">OB</label>
+                    <input type="text" id="ob-input" name="ob" placeholder="Opción B...">
+                </div>
+
+                <div class="form-group">
+                    <label for="oc-input">OC</label>
+                    <input type="text" id="oc-input" name="oc" placeholder="Opción C...">
+                </div>
+
+                <div class="form-group">
+                    <label for="od-input">OD</label>
+                    <input type="text" id="od-input" name="od" placeholder="Opción D...">
+                </div>
+
+                <div class="form-group">
+                    <label for="oe-input">OE</label>
+                    <input type="text" id="oe-input" name="oe" placeholder="Opción E...">
+                </div>
+
+                <div class="form-group">
+                    <label for="rpta-input">RPTA</label>
+                    <input type="text" id="rpta-input" name="rpta" placeholder="Respuesta correcta...">
+                </div>
+
+                <div class="form-group">
+                    <label for="categoria-input">CATEGORIA</label>
+                    <input type="text" id="categoria-input" name="categoria" placeholder="Categoría de la pregunta...">
+                </div>
+
+                <div class="submit-container">
+                    <!-- El botón de abajo lo he dejado en dorado para que resalte como acción principal -->
+                    <button type="button" class="cyber-btn btn-gold" id="bton">BOTON</button>
+                </div>
+            </form>
+        </main>
+    </div>
+
+</body>
+<script>
+    const insertabton = document.getElementById("btn-insertar")
+    const cambiarbton = document.getElementById("btn-cambiar")
+    const contenedorgeneral = document.querySelector(".content-area")
+    const bton = document.getElementById("bton")
+    const titulo = document.querySelector(".hud-title")
+    const idinpt = document.getElementById("id-input")
+    const questioninpt =document.getElementById("pregunta-input")
+    const oainpt=document.getElementById("oa-input")
+    const obinpt=document.getElementById("ob-input")
+    const ocinpt =document.getElementById("oc-input")
+    const odinpt =document.getElementById("od-input")
+    const oeinpt =document.getElementById("oe-input")
+    const rptainpt =document.getElementById("rpta-input")
+    const categoriainpt =document.getElementById("categoria-input")
+    let valor 
+    insertabton.addEventListener("click",()=>{
+        contenedorgeneral.style.display = "block"
+        titulo.textContent = "Insertar pregunta"
+        bton.textContent = "Insertar"
+        valor = "insertar"
+    })
+    cambiarbton.addEventListener("click",()=>{
+        contenedorgeneral.style.display = "block"
+        titulo.textContent = "Cambiar pregunta"
+        bton.textContent = "Cambiar"
+        valor = "cambiar"
+    })
+
+
+    bton.addEventListener("click",()=>{
+        if (valor === "insertar"){
+            fetch("/enviarpregunta",{
+                method:"POST",
+                headers:{"Content-Type": "application/json"},
+                body:JSON.stringify({pregunta:questioninpt.value,
+                    oA:oainpt.value,
+                    oB:obinpt.value,
+                    oC:ocinpt.value,
+                    oD:odinpt.value,
+                    oE:oeinpt.value,
+                    rpta:rptainpt.value,
+                    categoria:categoriainpt.value
+                })
+            })
+        } else if (valor === "cambiar"){
+            fetch("/cambiarpregunta",{
+                method:"POST",
+                headers:{"Content-Type": "application/json"},
+                body:JSON.stringify({id:idinpt.value,
+                    pregunta:questioninpt.value,
+                    oA:oainpt.value,
+                    oB:obinpt.value,
+                    oC:ocinpt.value,
+                    oD:odinpt.value,
+                    oE:oeinpt.value,
+                    rpta:rptainpt.value,
+                    categoria:categoriainpt.value
+                })
+            })
+        }
+    })
+</script>
+</html>

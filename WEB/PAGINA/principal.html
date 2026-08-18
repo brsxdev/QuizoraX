@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizoraX - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Chakra+Petch:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #060810;
+            --card-bg: rgba(14, 18, 30, 0.92);
+            --gold-accent: #ffb703;
+            --cyber-cyan: #00f0ff;
+            --plasma-magenta: #ff0077;
+            --alert-red: #ff3344;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --item-bg: rgba(255, 255, 255, 0.03);
+            --item-border: rgba(0, 240, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Chakra Petch', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            background-image: 
+                radial-gradient(ellipse at 50% 0%, rgba(255, 183, 3, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0, 240, 255, 0.1) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(6, 8, 16, 0.8) 0%, rgba(6, 8, 16, 0.95) 100%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.02) 2px, rgba(0, 240, 255, 0.02) 4px);
+        }
+
+        /* Líneas Neón de adorno */
+        .cyber-line-top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold-accent), var(--cyber-cyan), transparent);
+            box-shadow: 0 0 15px var(--cyber-cyan);
+            z-index: 10;
+        }
+
+        .cyber-line-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--plasma-magenta), var(--gold-accent), transparent);
+            box-shadow: 0 0 15px var(--plasma-magenta);
+            z-index: 10;
+        }
+
+        /* CONTENEDOR PRINCIPAL EXTERNO */
+        .wrapper {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        /* TÍTULO PRINCIPAL "QuizoraX" */
+        .hud-title {
+            font-family: 'Teko', sans-serif;
+            font-size: clamp(3.2rem, 7vw, 4.8rem);
+            line-height: 0.9;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text-primary);
+            background: linear-gradient(180deg, #ffffff 30%, var(--cyber-cyan) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.4));
+        }
+
+        /* CONTENEDOR GENERAL INTERNO */
+        .hud-card {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6),
+                        0 0 25px rgba(0, 240, 255, 0.08);
+            clip-path: polygon(
+                0 20px, 
+                20px 0, 
+                calc(100% - 20px) 0, 
+                100% 20px, 
+                100% calc(100% - 20px), 
+                calc(100% - 20px) 100%, 
+                20px 100%, 
+                0 calc(100% - 20px)
+            );
+        }
+
+        .hud-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 3px;
+            background: var(--gold-accent);
+            box-shadow: 0 0 10px var(--gold-accent);
+        }
+        .user-name {
+            font-family: 'Teko', sans-serif;
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+            color: var(--gold-accent);
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px rgba(255, 183, 3, 0.3);
+        }
+
+        .btn-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        .cyber-btn {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            outline: none;
+            border: none;
+            width: 100%;
+            display: inline-block;
+        }
+
+        /* BTON 1: Ver perfil */        .btn-cyan {
+            background: rgba(0, 240, 255, 0.05);
+            color: var(--cyber-cyan);
+            border: 1.5px solid var(--cyber-cyan);
+            font-weight: 600;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .btn-cyan:hover {
+            background: rgba(0, 240, 255, 0.2);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold-accent) 0%, #d48800 100%);
+            color: #060810;
+            font-weight: 700;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+            box-shadow: 0 0 15px rgba(255, 183, 3, 0.3);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #ffc83b 0%, var(--gold-accent) 100%);
+            box-shadow: 0 0 25px rgba(255, 183, 3, 0.6);
+        }
+
+        .btn-magenta {
+            background: rgba(255, 0, 119, 0.05);
+            color: var(--plasma-magenta);
+            border: 1.5px solid var(--plasma-magenta);
+            font-weight: 600;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .btn-magenta:hover {
+            background: rgba(255, 0, 119, 0.2);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 0, 119, 0.4);
+            transform: translateY(-2px);
+        }
+        #admin{
+            display: none;
+        }
+        .btn-logout {
+            margin-top: 25px;
+            background: rgba(255, 51, 68, 0.08);
+            color: var(--alert-red);
+            border: 1.5px solid var(--alert-red);
+            font-weight: 600;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 51, 68, 0.25);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 51, 68, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* CONTENEDOR DE CATEGORÍAS */
+        .categories-container {
+            width: 100%;
+            height: 280px;
+            background: rgba(6, 8, 16, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        /* Título interno del contenedor */
+        .categories-header {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            text-align: left;
+            margin-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+        }
+
+        /* Elemento/Card dentro del scroll */
+        .category-card {
+            background: var(--item-bg);
+            border: 1px solid var(--item-border);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .category-card:hover {
+            border-color: var(--cyber-cyan);
+            background: rgba(0, 240, 255, 0.05);
+            transform: translateX(4px);
+        }
+
+        .category-card h3 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .category-card span {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.1rem;
+            color: var(--gold-accent);
+        }
+
+        /* PERSONALIZACIÓN DEL SCROLLBAR VERTICAL */
+        .categories-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .categories-container::-webkit-scrollbar-track {
+            background: rgba(6, 8, 16, 0.8);
+            border-left: 1px solid rgba(0, 240, 255, 0.05);
+        }
+
+        .categories-container::-webkit-scrollbar-thumb {
+            background: var(--cyber-cyan);
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--cyber-cyan);
+        }
+
+        .categories-container::-webkit-scrollbar-thumb:hover {
+            background: var(--gold-accent);
+            box-shadow: 0 0 10px var(--gold-accent);
+        }
+
+        /* RESPONSIVE DESIGN (Tablets y Celulares) */
+        @media (max-width: 768px) {
+            .btn-row {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .hud-card {
+                padding: 30px 20px;
+            }
+
+            .categories-container {
+                height: 240px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hud-title {
+                font-size: 3rem;
+            }
+
+            .user-name {
+                font-size: 1.8rem;
+            }
+            
+            .cyber-btn {
+                font-size: 1.15rem;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cyber-line-top"></div>
+    <div class="cyber-line-bottom"></div>
+    <div class="wrapper">
+        <h1 class="hud-title">QuizoraX</h1>
+        <main class="hud-card">
+            <h2 class="user-name">USERNAME</h2>
+            <div class="btn-row">
+                <button class="cyber-btn btn-cyan" id="vp">Ver perfil</button>
+                <button class="cyber-btn btn-gold" id="rk">Ranking global</button>
+                <button class="cyber-btn btn-magenta" id="cg">Configuracion</button>
+                <button class="cyber-btn btn-cyan" id="admin">Panel de administración</button>
+            </div>
+
+            <section class="categories-container">
+                <div class="categories-header">Categorías</div>
+                <div class="category-card" id="Historia mundial">
+                    <h3>Historia Mundial</h3>
+                    <span>20 preguntas</span>
+                </div>
+                <div class="category-card" id="Videojuegos">
+                    <h3>Videojuegos</h3>
+                    <span>20 preguntas</span>
+                </div>
+                <div class="category-card" id="Geografía">
+                    <h3>Geografía</h3>
+                    <span>20 preguntas</span>
+                </div>
+                <div class="category-card" id="Programación">
+                    <h3>Programación(Fundamentos,Python,Javascript)</h3>
+                    <span>20 preguntas</span>
+                </div>
+            </section>
+            <button class="cyber-btn btn-logout" id="logout">Cerrar sesión</button>
+
+        </main>
+    </div>
+
+</body>
+<script>
+    const usernametxt = document.querySelector(".user-name")
+    const adm = document.getElementById("admin")
+    const vp = document.getElementById("vp")
+    const rk = document.getElementById("rk")
+    const cg = document.getElementById("cg")
+    const logout = document.getElementById("logout")
+    const cardsareas = document.getElementsByClassName("category-card")
+    const arrayareas = Array.from(cardsareas)
+    let id_user
+    fetch("/actualusuario")
+    .then(res=>res.json())
+    .then(rpta=>{
+        usernametxt.textContent = rpta.usuario
+        id_user = rpta.usuarioid
+        if (id_user === 1){
+        adm.style.display = "block"
+        adm.addEventListener("click",()=>{
+            if (id_user === 1){
+                window.location.href = "/admin"
+            }
+        })
+    }
+    })
+    fetch("/ponerenranking",{
+        method:"POST"
+    })
+    vp.addEventListener("click",()=>{
+        window.location.href = `/perfiles/${id_user}`
+    })
+    rk.addEventListener("click",()=>{
+        window.location.href = `/ranking`
+    })
+    cg.addEventListener("click",()=>{
+        window.location.href = `/configuracion`
+    })
+    logout.addEventListener("click",()=>{
+        fetch("/cerrarsesion",{method:"POST"})
+        .then(res=>res.json())
+        .then(rptanueva=>{
+            if (rptanueva.cerrado){
+                window.location.replace("/")
+            }
+        })
+    })
+    for (let elemento of arrayareas){
+        let id = elemento.id
+        elemento.addEventListener("click",()=>{
+            localStorage.setItem("AREA",id)
+            window.location.replace("/preguntas")
+        })
+    }
+    </script>
+</html>

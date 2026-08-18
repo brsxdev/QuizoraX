@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizoraX - ÁREA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Chakra+Petch:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #060810;
+            --card-bg: rgba(14, 18, 30, 0.95);
+            --gold-accent: #ffb703;
+            --cyber-cyan: #00f0ff;
+            --plasma-magenta: #ff0077;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Chakra Petch', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            background-image: 
+                radial-gradient(ellipse at 50% 0%, rgba(255, 183, 3, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 100%, rgba(0, 240, 255, 0.1) 0%, transparent 70%),
+                linear-gradient(180deg, rgba(6, 8, 16, 0.8) 0%, rgba(6, 8, 16, 0.95) 100%),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.02) 2px, rgba(0, 240, 255, 0.02) 4px);
+        }
+
+        /* Líneas de escáner superior e inferior */
+        .cyber-line-top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold-accent), var(--cyber-cyan), transparent);
+            box-shadow: 0 0 15px var(--cyber-cyan);
+            z-index: 10;
+        }
+
+        .cyber-line-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--plasma-magenta), var(--gold-accent), transparent);
+            box-shadow: 0 0 15px var(--plasma-magenta);
+            z-index: 10;
+        }
+
+        /* Tarjeta Contenedor Compacta */
+        .hud-card {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 240, 255, 0.25);
+            padding: 40px 35px 35px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6),
+                        0 0 25px rgba(0, 240, 255, 0.08);
+            clip-path: polygon(
+                0 25px, 
+                25px 0, 
+                calc(100% - 25px) 0, 
+                100% 25px, 
+                100% calc(100% - 25px), 
+                calc(100% - 25px) 100%, 
+                25px 100%, 
+                0 calc(100% - 25px)
+            );
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hud-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 3px;
+            background: var(--gold-accent);
+            box-shadow: 0 0 10px var(--gold-accent);
+        }
+
+        /* TÍTULO (AREA) */
+        .hud-title {
+            font-family: 'Teko', sans-serif;
+            font-size: clamp(3rem, 7vw, 4.2rem);
+            line-height: 0.9;
+            font-weight: 700;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            
+            color: var(--text-primary);
+            background: linear-gradient(180deg, #ffffff 30%, var(--cyber-cyan) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            
+            filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.4));
+        }
+
+        /* PREGUNTA (Más grande y destacada) */
+        .hud-question {
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            line-height: 1.3;
+            color: #ffffff;
+            width: 100%;
+            font-weight: 700;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.25);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* CONTENEDOR DE BOTONES (Grid con botones iguales) */
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 16px;
+            width: 100%;
+            max-width: 750px;
+        }
+
+        /* Estilo base de los botones */
+        .cyber-btn {
+            font-family: 'Teko', sans-serif;
+            font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 14px 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            outline: none;
+            border: 1.5px solid var(--cyber-cyan);
+            background: rgba(0, 240, 255, 0.05);
+            color: var(--cyber-cyan);
+            font-weight: 600;
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .cyber-btn:hover {
+            background: rgba(0, 240, 255, 0.2);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .cyber-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Disposición 3-2 manteniendo el mismo tamaño */
+        .bton-1 { grid-column: span 2; }
+        .bton-2 { grid-column: span 2;}
+        .bton-3 { grid-column: span 2; }
+        .bton-4 { grid-column: 2 / span 2; }
+        .bton-5 { grid-column: 4 / span 2; }
+        @media (max-width: 650px) {
+            .hud-card {
+                padding: 30px 18px 25px;
+            }
+            .hud-question {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+            .buttons-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .cyber-btn {
+                padding: 12px;
+                font-size: 1.4rem;
+            }
+        }
+        .mensaje-centro {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: min(750px, 85vw);
+    min-height: 300px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+
+}
+
+.mensaje-centro::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 180px;
+    height: 3px;
+}
+
+.mensaje-centro p {
+    width: 90%;
+
+    font-family: 'Teko', sans-serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+
+    color: var(--text-primary);
+}
+
+
+
+@media (max-width: 650px) {
+    .mensaje-centro {
+        width: 88vw;
+        min-height: 220px;
+    }
+
+    .mensaje-centro p {
+        font-size: clamp(2.5rem, 12vw, 4rem);
+        letter-spacing: 3px;
+    }
+
+    .mensaje-centro::before {
+        width: 120px;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <div class="cyber-line-top"></div>
+    <div class="cyber-line-bottom"></div>
+    <div class="mensaje-centro">
+    <p id="contador"></p>
+</div>
+
+    <main class="hud-card">
+        <h1 class="hud-title">AREA</h1>
+        <p class="hud-question">Pregunta</p>
+        
+        <div class="buttons-grid">
+            <button class="cyber-btn bton-1">bton1</button>
+            <button class="cyber-btn bton-2">bton2</button>
+            <button class="cyber-btn bton-3">bton3</button>
+            <button class="cyber-btn bton-4">bton4</button>
+            <button class="cyber-btn bton-5">bton5</button>
+        </div>
+    </main>
+
+</body>
+<script>
+    setTimeout(()=>{
+        const contador = document.getElementById("contador")
+        const mensaje_centro = document.querySelector(".mensaje-centro")
+        const general = document.querySelector(".hud-card")
+        const hud_title = document.querySelector(".hud-title")
+        const hud_question = document.querySelector(".hud-question")
+        const btn1 = document.querySelector(".bton-1")
+        const btn2 = document.querySelector(".bton-2")
+        const btn3 = document.querySelector(".bton-3")
+        const btn4 = document.querySelector(".bton-4")
+        const btn5 = document.querySelector(".bton-5")
+        let idusuario
+        fetch("/actualusuario")
+        .then(res=>res.json())
+        .then(datosusuario=>{
+            idusuario = datosusuario.usuarioid
+        })
+        fetch("/entregarpreguntas",{
+            method:"POST",
+            headers:{"Content-Type": "application/json"},
+            body:JSON.stringify({categoria:localStorage.getItem("AREA")})
+        })
+        .then(res=>res.json())
+        .then(rpta=>{
+            if (rpta.lista){
+                hud_title.textContent = localStorage.getItem("AREA")
+                localStorage.removeItem("AREA")
+                mensaje_centro.style.opacity = "1"
+
+        for (let i=3; i>0; i--){
+            setTimeout(()=>{
+                contador.textContent = `${i}`
+            },(3-i)*1000)
+        }
+        setTimeout(()=>{
+            contador.style.opacity = "0"
+        general.style.display = "flex"
+        },3000)
+        let puntos = 0
+        async function juego(){
+        console.log("JUEGO INICIADO")
+        function pasar(seg){
+            let cancelar
+            let esperar = new Promise(resolve=>{
+                let tiempo = seg
+                const intervalo = setInterval(()=>{
+                    tiempo--
+                    if (tiempo < 0){
+                        clearInterval(intervalo)
+                        resolve()
+                    }
+                },1000)
+
+                cancelar = ()=>{
+                    clearInterval(intervalo)
+                    resolve()
+                }
+            })
+            return [esperar,cancelar]
+        }
+            for (let elemento of rpta.lista){
+                let [esperar,cancelar] = pasar(15)
+                let contadornuevo = 15
+                let btones = []
+            let intervaloPregunta = setInterval(()=>{
+            contadornuevo--
+        hud_question.textContent = elemento.pregunta + `(${contadornuevo}s)`
+        if (contadornuevo < 1){
+            clearInterval(intervaloPregunta)
+        }
+            },1000)
+            btn1.textContent = elemento.oA
+            btn2.textContent = elemento.oB
+            btn3.textContent = elemento.oC
+            btn4.textContent = elemento.oD
+            btn5.textContent = elemento.oE
+            btones.push(btn1,btn2,btn3,btn4,btn5)
+            btones.forEach(btn => btn.style.backgroundColor = "")
+            let notocar = false
+            for (let bton of btones){
+                bton.onclick = ()=>{
+                    if (notocar === true){
+                        return
+                    }
+                    if (bton.textContent.trim() === elemento.rpta.trim()){
+                    console.log("Correcto")
+                    puntos += 5
+                    bton.style.backgroundColor = "#2dc802"
+                    } else if (bton.textContent.trim() !== elemento.rpta.trim()){
+                        if (puntos >= 5){
+                            puntos -= 5
+                        }
+                        console.log("Incorrecto")
+                    bton.style.backgroundColor = "#9e0411"
+                    }
+                    notocar = true
+                
+                    clearInterval(intervaloPregunta)
+            cancelar()
+
+
+                }
+            }
+            await esperar
+            await new Promise(res => setTimeout(res, 1000))
+            }
+            //
+            fetch("/sumarpuntos",{method:"POST",headers:{"Content-Type": "application/json"},body:JSON.stringify({puntosacumulados:puntos, usuarioid:idusuario})})
+            general.style.display = "none"
+            contador.textContent = "Cuestionario terminado"
+            contador.style.opacity = "1"
+            await new Promise(resolve => {
+    setTimeout(() => {
+        for (let i=0; i<= puntos; i++) {
+            setTimeout(() => {
+                contador.textContent = `Puntos acumulados: +${i}`
+                if (i===puntos){
+                    setTimeout(()=>{
+                        resolve()
+                    },1500)
+                }
+            }, i * 50)
+        }
+    }, 1500)
+})
+window.location.replace("/principal")
+        }
+        juego()
+        }
+        })
+    },500)
+</script>
+</html>
