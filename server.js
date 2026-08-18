@@ -280,7 +280,7 @@ servidorexpress.post("/sumarpuntos",(req,res)=>{
         SET puntos = COALESCE(puntos, 0) + ?
         WHERE usuario_id=?`,[puntosacumulados,usuarioid],(err,result)=>{
             if (err){return}
-            res.end()
+            res.json({exito:true})
         })
 })
 const PORT = process.env.PORT || 3000;

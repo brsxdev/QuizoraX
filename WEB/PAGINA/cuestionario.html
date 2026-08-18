@@ -395,7 +395,10 @@
             }
             //
             fetch("/sumarpuntos",{method:"POST",headers:{"Content-Type": "application/json"},body:JSON.stringify({puntosacumulados:puntos, usuarioid:idusuario})})
-            general.style.display = "none"
+            .then(res=>res.json())
+            .then(async nuevarespta=>{
+                if (nuevarespta.exito){
+                    general.style.display = "none"
             contador.textContent = "Cuestionario terminado"
             contador.style.opacity = "1"
             await new Promise(resolve => {
@@ -413,6 +416,8 @@
     }, 1500)
 })
 window.location.replace("/principal")
+                }
+            })
         }
         juego()
         }
