@@ -5,10 +5,23 @@ const conexion = require("./sqlconexion")
 const servidorexpress = express()
 const servidorhttp = http.createServer(servidorexpress)
 const session = require("express-session")
+const MySQLStore = require("express-mysql-session")(session)
 const path = require("node:path")
 require("dotenv").config()
+const storeSesion = new MySQLStore({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    ssl: {
+        rejectUnauthorized: false
+    }
+})
+
 servidorexpress.use(session({
     secret:process.env.SESSION_SECRET,
+    store:storeSesion,
     rolling:true,
     resave:false,
     saveUninitialized:false,
